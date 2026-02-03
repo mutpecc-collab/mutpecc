@@ -10,7 +10,7 @@ export function Footer() {
           {/* Brand */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <img src={logo} alt="MUTPECC Logo" className="h-12 w-auto brightness-0 invert" />
+              <img src="/logo.png" alt="MUTPECC Logo" className="h-12 w-auto" />
             </div>
             <p className="text-background/70 text-sm leading-relaxed">
               Mental health guidance and counseling platform. Creating a safe space 
@@ -58,15 +58,15 @@ export function Footer() {
             <ul className="space-y-3">
               <li className="flex items-center gap-3 text-background/70 text-sm">
                 <Mail className="w-4 h-4" />
-                hello@mutpecc.org
+                hello@mutpecc.org "need to be updated"
               </li>
               <li className="flex items-center gap-3 text-background/70 text-sm">
                 <Phone className="w-4 h-4" />
-                +1 (234) 567-890
+                need to be updates
               </li>
               <li className="flex items-start gap-3 text-background/70 text-sm">
                 <MapPin className="w-4 h-4 mt-0.5" />
-                123 Wellness Street, Health City
+                Murang'a University "need to be updated"
               </li>
             </ul>
           </div>

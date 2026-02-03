@@ -32,8 +32,7 @@ export function Header() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 md:h-20">
           <Link to="/" className="flex items-center gap-2">
-            <img src={logo} alt="MUTPECC Logo" className="h-12 w-auto" />
-          </Link>
+           <img src="/logo.png" alt="MUTPECC Logo" className="h-12 w-auto" />
 
           <nav className="hidden lg:flex items-center gap-1">
             {navLinks.map((link) => (
