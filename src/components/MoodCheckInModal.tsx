@@ -5,51 +5,93 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import type { Database } from "@/integrations/supabase/types";
 
-type MoodType = "happy" | "sad" | "anxious" | "angry" | "confused" | "hopeful" | null;
-
-const moods: { type: MoodType; emoji: string; label: string; color: string }[] = [
-  { type: "happy", emoji: "😊", label: "Happy", color: "bg-sage-100 hover:bg-sage-200 border-sage-300" },
-  { type: "sad", emoji: "😢", label: "Sad", color: "bg-blue-50 hover:bg-blue-100 border-blue-200" },
-  { type: "anxious", emoji: "😰", label: "Anxious", color: "bg-amber-50 hover:bg-amber-100 border-amber-200" },
-  { type: "angry", emoji: "😠", label: "Angry", color: "bg-red-50 hover:bg-red-100 border-red-200" },
-  { type: "confused", emoji: "😕", label: "Confused", color: "bg-purple-50 hover:bg-purple-100 border-purple-200" },
-  { type: "hopeful", emoji: "🌟", label: "Hopeful", color: "bg-coral-50 hover:bg-coral-100 border-coral-200" },
-];
+type MoodType = Database["public"]["Enums"]["mood_type"];
 
 interface MoodCheckInModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
+const feelingOptions = [
+  { value: "happy", label: "Okay", emoji: "😊" },
+  { value: "hopeful", label: "Happy", emoji: "🌟" },
+  { value: "stressed", label: "Overwhelmed", emoji: "😫" },
+  { value: "neutral", label: "Numb", emoji: "😐" },
+  { value: "sad", label: "Very Low", emoji: "😢" },
+];
+
+const bodyOptions = [
+  { value: "relaxed", label: "Relaxed" },
+  { value: "tense", label: "Tense" },
+  { value: "tired", label: "Tired" },
+  { value: "restless", label: "Restless" },
+  { value: "heavy", label: "Heavy" },
+  { value: "not_sure", label: "Not sure" },
+];
+
+const thoughtOptions = [
+  { value: "mostly_positive", label: "Mostly positive" },
+  { value: "mixed", label: "Mix of good & bad" },
+  { value: "heavy", label: "Heavy" },
+  { value: "quiet", label: "Quiet" },
+];
+
+const needOptions = [
+  { value: "someone_to_listen", label: "Someone to listen" },
+  { value: "encouragement", label: "Encouragement" },
+  { value: "understanding", label: "Understanding" },
+  { value: "dont_know", label: "I don't know yet" },
+];
+
 export function MoodCheckInModal({ isOpen, onClose }: MoodCheckInModalProps) {
   const { toast } = useToast();
   const [step, setStep] = useState(1);
-  const [selectedMood, setSelectedMood] = useState<MoodType>(null);
-  const [feelings, setFeelings] = useState("");
-  const [reason, setReason] = useState("");
-  const [solution, setSolution] = useState("");
+  const [selectedFeeling, setSelectedFeeling] = useState<string | null>(null);
+  const [selectedBody, setSelectedBody] = useState<string | null>(null);
+  const [selectedThought, setSelectedThought] = useState<string | null>(null);
+  const [selectedNeed, setSelectedNeed] = useState<string | null>(null);
+  const [oneWord, setOneWord] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const getMoodType = (): MoodType => {
+    const moodMap: Record<string, MoodType> = {
+      happy: "happy",
+      hopeful: "hopeful",
+      stressed: "stressed",
+      neutral: "neutral",
+      sad: "sad",
+    };
+    return moodMap[selectedFeeling || "neutral"] || "neutral";
+  };
+
   const handleSubmit = async () => {
-    if (!selectedMood || !name || !email) return;
+    if (!selectedFeeling || !name || !email || !phone) return;
     setIsSubmitting(true);
-    
+
+    const feelings = [
+      `Body: ${selectedBody || "Not specified"}`,
+      `Thoughts: ${selectedThought || "Not specified"}`,
+      `Need: ${selectedNeed || "Not specified"}`,
+      `One word: ${oneWord || "Not specified"}`,
+    ].join(" | ");
+
     const { error } = await supabase.from("mood_forms").insert({
-      mood: selectedMood,
-      feelings: feelings || null,
-      cause: reason || null,
-      proposed_solution: solution || null,
+      mood: getMoodType(),
+      feelings,
+      cause: null,
+      proposed_solution: null,
       name,
-      phone: phone || "N/A",
+      phone,
       email,
     });
 
     setIsSubmitting(false);
-    
+
     if (error) {
       toast({ title: "Error", description: "Failed to submit. Please try again.", variant: "destructive" });
     } else {
@@ -59,11 +101,12 @@ export function MoodCheckInModal({ isOpen, onClose }: MoodCheckInModalProps) {
   };
 
   const canProceed = () => {
-    if (step === 1) return selectedMood !== null;
-    if (step === 2) return feelings.trim().length > 0;
-    if (step === 3) return reason.trim().length > 0;
-    if (step === 4) return true; // Solution is optional
-    if (step === 5) return name.trim().length > 0 && email.trim().length > 0;
+    if (step === 1) return selectedFeeling !== null;
+    if (step === 2) return selectedBody !== null;
+    if (step === 3) return selectedThought !== null;
+    if (step === 4) return selectedNeed !== null;
+    if (step === 5) return oneWord.trim().length > 0;
+    if (step === 6) return name.trim().length > 0 && email.trim().length > 0 && phone.trim().length > 0;
     return true;
   };
 
@@ -80,27 +123,27 @@ export function MoodCheckInModal({ isOpen, onClose }: MoodCheckInModalProps) {
           >
             <div className="text-center">
               <h3 className="text-2xl font-serif font-semibold text-foreground mb-2">
-                How is your mood today?
+                Hi there 👋
               </h3>
               <p className="text-muted-foreground">
-                Select the emotion that best describes how you're feeling
+                How are you feeling right now?
               </p>
             </div>
-            <div className="grid grid-cols-3 gap-3">
-              {moods.map((mood) => (
+            <div className="grid grid-cols-2 gap-3">
+              {feelingOptions.map((option) => (
                 <button
-                  key={mood.type}
-                  onClick={() => setSelectedMood(mood.type)}
+                  key={option.value}
+                  onClick={() => setSelectedFeeling(option.value)}
                   className={cn(
-                    "flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all duration-200",
-                    mood.color,
-                    selectedMood === mood.type
-                      ? "ring-2 ring-primary ring-offset-2 scale-105"
-                      : "hover:scale-102"
+                    "flex items-center gap-3 p-4 rounded-xl border-2 transition-all duration-200 text-left",
+                    "bg-secondary/50 hover:bg-secondary border-border",
+                    selectedFeeling === option.value
+                      ? "ring-2 ring-primary ring-offset-2 border-primary"
+                      : "hover:border-primary/50"
                   )}
                 >
-                  <span className="text-3xl">{mood.emoji}</span>
-                  <span className="text-sm font-medium">{mood.label}</span>
+                  <span className="text-2xl">{option.emoji}</span>
+                  <span className="font-medium text-foreground">{option.label}</span>
                 </button>
               ))}
             </div>
@@ -118,18 +161,26 @@ export function MoodCheckInModal({ isOpen, onClose }: MoodCheckInModalProps) {
           >
             <div className="text-center">
               <h3 className="text-2xl font-serif font-semibold text-foreground mb-2">
-                How do you feel?
+                Which best describes your body right now?
               </h3>
-              <p className="text-muted-foreground">
-                Share more about what's on your mind
-              </p>
             </div>
-            <textarea
-              value={feelings}
-              onChange={(e) => setFeelings(e.target.value)}
-              placeholder="I feel..."
-              className="w-full h-32 p-4 rounded-xl border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-            />
+            <div className="grid grid-cols-2 gap-3">
+              {bodyOptions.map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => setSelectedBody(option.value)}
+                  className={cn(
+                    "flex items-center justify-center p-4 rounded-xl border-2 transition-all duration-200",
+                    "bg-secondary/50 hover:bg-secondary border-border",
+                    selectedBody === option.value
+                      ? "ring-2 ring-primary ring-offset-2 border-primary"
+                      : "hover:border-primary/50"
+                  )}
+                >
+                  <span className="font-medium text-foreground">{option.label}</span>
+                </button>
+              ))}
+            </div>
           </motion.div>
         );
 
@@ -144,18 +195,26 @@ export function MoodCheckInModal({ isOpen, onClose }: MoodCheckInModalProps) {
           >
             <div className="text-center">
               <h3 className="text-2xl font-serif font-semibold text-foreground mb-2">
-                What led to this?
+                What were your thoughts like today?
               </h3>
-              <p className="text-muted-foreground">
-                Understanding the cause helps us help you better
-              </p>
             </div>
-            <textarea
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              placeholder="This happened because..."
-              className="w-full h-32 p-4 rounded-xl border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-            />
+            <div className="grid grid-cols-2 gap-3">
+              {thoughtOptions.map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => setSelectedThought(option.value)}
+                  className={cn(
+                    "flex items-center justify-center p-4 rounded-xl border-2 transition-all duration-200",
+                    "bg-secondary/50 hover:bg-secondary border-border",
+                    selectedThought === option.value
+                      ? "ring-2 ring-primary ring-offset-2 border-primary"
+                      : "hover:border-primary/50"
+                  )}
+                >
+                  <span className="font-medium text-foreground">{option.label}</span>
+                </button>
+              ))}
+            </div>
           </motion.div>
         );
 
@@ -170,18 +229,26 @@ export function MoodCheckInModal({ isOpen, onClose }: MoodCheckInModalProps) {
           >
             <div className="text-center">
               <h3 className="text-2xl font-serif font-semibold text-foreground mb-2">
-                Your proposed solution
+                What do you need most right now?
               </h3>
-              <p className="text-muted-foreground">
-                What do you think could help? (Optional)
-              </p>
             </div>
-            <textarea
-              value={solution}
-              onChange={(e) => setSolution(e.target.value)}
-              placeholder="I think I could..."
-              className="w-full h-32 p-4 rounded-xl border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-            />
+            <div className="grid grid-cols-2 gap-3">
+              {needOptions.map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => setSelectedNeed(option.value)}
+                  className={cn(
+                    "flex items-center justify-center p-4 rounded-xl border-2 transition-all duration-200",
+                    "bg-secondary/50 hover:bg-secondary border-border",
+                    selectedNeed === option.value
+                      ? "ring-2 ring-primary ring-offset-2 border-primary"
+                      : "hover:border-primary/50"
+                  )}
+                >
+                  <span className="font-medium text-foreground text-center">{option.label}</span>
+                </button>
+              ))}
+            </div>
           </motion.div>
         );
 
@@ -189,6 +256,30 @@ export function MoodCheckInModal({ isOpen, onClose }: MoodCheckInModalProps) {
         return (
           <motion.div
             key="step5"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="space-y-6"
+          >
+            <div className="text-center">
+              <h3 className="text-2xl font-serif font-semibold text-foreground mb-2">
+                If you were to describe today in one word, what would it be?
+              </h3>
+            </div>
+            <input
+              type="text"
+              value={oneWord}
+              onChange={(e) => setOneWord(e.target.value)}
+              placeholder="One word..."
+              className="w-full p-4 rounded-xl border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-center text-lg"
+            />
+          </motion.div>
+        );
+
+      case 6:
+        return (
+          <motion.div
+            key="step6"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
@@ -214,7 +305,7 @@ export function MoodCheckInModal({ isOpen, onClose }: MoodCheckInModalProps) {
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="Phone number (optional)"
+                placeholder="Phone number"
                 className="w-full p-4 rounded-xl border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               />
               <input
@@ -256,7 +347,7 @@ export function MoodCheckInModal({ isOpen, onClose }: MoodCheckInModalProps) {
               >
                 <X className="w-5 h-5 text-muted-foreground" />
               </button>
-              
+
               {/* Confidentiality Banner */}
               <div className="flex items-center gap-2 px-4 py-2 bg-sage-50 rounded-lg mb-4">
                 <Shield className="w-4 h-4 text-primary" />
@@ -267,7 +358,7 @@ export function MoodCheckInModal({ isOpen, onClose }: MoodCheckInModalProps) {
 
               {/* Progress */}
               <div className="flex gap-2">
-                {[1, 2, 3, 4, 5].map((s) => (
+                {[1, 2, 3, 4, 5, 6].map((s) => (
                   <div
                     key={s}
                     className={cn(
@@ -307,19 +398,19 @@ export function MoodCheckInModal({ isOpen, onClose }: MoodCheckInModalProps) {
               <Button
                 variant="hero"
                 onClick={() => {
-                  if (step < 5) {
+                  if (step < 6) {
                     setStep(step + 1);
                   } else {
                     handleSubmit();
                   }
                 }}
-                disabled={!canProceed()}
+                disabled={!canProceed() || isSubmitting}
                 className="flex-1"
               >
-                {step === 5 ? (
+                {step === 6 ? (
                   <>
                     <Heart className="w-4 h-4" />
-                    Submit
+                    {isSubmitting ? "Submitting..." : "Submit"}
                   </>
                 ) : (
                   <>
