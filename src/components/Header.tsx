@@ -31,8 +31,12 @@ export function Header() {
     <header className="fixed top-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-md border-b border-border">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 md:h-20">
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-3">
             <img src="/logo.png" alt="MUTPECC Logo" className="h-12 w-auto" />
+            <div className="hidden sm:block">
+              <span className="text-xl font-serif font-bold text-primary tracking-wide">MUTPECC</span>
+              <p className="text-[10px] text-muted-foreground leading-tight -mt-0.5">Muranga University of Technology</p>
+            </div>
           </Link>
 
           <nav className="hidden lg:flex items-center gap-1">
