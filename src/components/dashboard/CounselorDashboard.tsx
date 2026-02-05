@@ -9,11 +9,15 @@ import {
   Clock,
   User,
   MessageCircle,
-  Send
+  Send,
+  Sparkles,
+  HeartHandshake,
+  TrendingUp
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -31,6 +35,7 @@ export function CounselorDashboard() {
   const [assignedSessions, setAssignedSessions] = useState<Session[]>([]);
   const [qaThreads, setQAThreads] = useState<QAThread[]>([]);
   const [loading, setLoading] = useState(true);
+  const [replyText, setReplyText] = useState<Record<string, string>>({});
 
   useEffect(() => {
     fetchData();
@@ -107,7 +112,10 @@ export function CounselorDashboard() {
     }
   };
 
-  const handleReplyQuestion = async (threadId: string, reply: string) => {
+  const handleReplyQuestion = async (threadId: string) => {
+    const reply = replyText[threadId];
+    if (!reply?.trim()) return;
+
     const { error } = await supabase
       .from("qa_threads")
       .update({
@@ -128,6 +136,7 @@ export function CounselorDashboard() {
         title: "Reply Sent",
         description: "Your reply has been sent.",
       });
+      setReplyText(prev => ({ ...prev, [threadId]: "" }));
       fetchData();
     }
   };
@@ -147,6 +156,7 @@ export function CounselorDashboard() {
   };
 
   const unansweredQuestions = qaThreads.filter(q => !q.reply);
+  const completedSessions = assignedSessions.filter(s => s.status === "completed").length;
 
   return (
     <div className="space-y-8">
@@ -154,149 +164,159 @@ export function CounselorDashboard() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-card rounded-2xl p-6 shadow-soft"
+        className="relative overflow-hidden bg-gradient-to-br from-blue-500/10 via-purple-500/5 to-background rounded-3xl p-8 border border-blue-500/20"
       >
-        <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-full gradient-sage flex items-center justify-center">
-            <User className="w-8 h-8 text-primary-foreground" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <div className="relative">
+          <div className="flex items-center gap-5">
+            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg">
+              <HeartHandshake className="w-10 h-10 text-white" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <Sparkles className="w-5 h-5 text-blue-500" />
+                <span className="text-sm font-medium text-blue-600">Counselor Dashboard</span>
+              </div>
+              <h1 className="text-3xl font-serif font-bold text-foreground">
+                Welcome, Counselor!
+              </h1>
+              <p className="text-muted-foreground mt-1">
+                Help those in need and make a difference today.
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl font-serif font-bold text-foreground">
-              Counselor Dashboard
-            </h1>
-            <p className="text-muted-foreground">
-              Help those in need and make a difference.
-            </p>
+
+          {/* Quick Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+            <div className="bg-card/80 backdrop-blur-sm rounded-xl p-4 border border-amber-200/50">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center shadow-md">
+                  <Clock className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-foreground">{unclaimedForms.length}</p>
+                  <p className="text-xs text-muted-foreground">New Requests</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-card/80 backdrop-blur-sm rounded-xl p-4 border border-blue-200/50">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center shadow-md">
+                  <Users className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-foreground">{claimedForms.length}</p>
+                  <p className="text-xs text-muted-foreground">My Clients</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-card/80 backdrop-blur-sm rounded-xl p-4 border border-purple-200/50">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-400 to-purple-500 flex items-center justify-center shadow-md">
+                  <MessageCircle className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-foreground">{unansweredQuestions.length}</p>
+                  <p className="text-xs text-muted-foreground">Questions</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-card/80 backdrop-blur-sm rounded-xl p-4 border border-green-200/50">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-400 to-green-500 flex items-center justify-center shadow-md">
+                  <TrendingUp className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-foreground">{completedSessions}</p>
+                  <p className="text-xs text-muted-foreground">Completed</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </motion.div>
 
-      {/* Stats */}
-      <div className="grid md:grid-cols-4 gap-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-card rounded-xl p-6 shadow-soft"
-        >
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
-              <Clock className="w-6 h-6 text-amber-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{unclaimedForms.length}</p>
-              <p className="text-sm text-muted-foreground">New Requests</p>
-            </div>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-card rounded-xl p-6 shadow-soft"
-        >
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
-              <Users className="w-6 h-6 text-blue-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{claimedForms.length}</p>
-              <p className="text-sm text-muted-foreground">My Clients</p>
-            </div>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="bg-card rounded-xl p-6 shadow-soft"
-        >
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center">
-              <MessageCircle className="w-6 h-6 text-purple-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{unansweredQuestions.length}</p>
-              <p className="text-sm text-muted-foreground">Questions</p>
-            </div>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="bg-card rounded-xl p-6 shadow-soft"
-        >
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
-              <CheckCircle className="w-6 h-6 text-green-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{assignedSessions.length}</p>
-              <p className="text-sm text-muted-foreground">Sessions</p>
-            </div>
-          </div>
-        </motion.div>
-      </div>
-
       {/* Main Tabs */}
       <Tabs defaultValue="requests" className="space-y-6">
-        <TabsList className="grid grid-cols-4 w-full max-w-2xl">
-          <TabsTrigger value="requests">Mood Requests</TabsTrigger>
-          <TabsTrigger value="clients">My Clients</TabsTrigger>
-          <TabsTrigger value="sessions">Sessions</TabsTrigger>
-          <TabsTrigger value="questions">Q&A</TabsTrigger>
+        <TabsList className="bg-card/80 backdrop-blur-sm border border-border/50 p-1 rounded-xl">
+          <TabsTrigger value="requests" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <Clock className="w-4 h-4 mr-2" />
+            New Requests
+            {unclaimedForms.length > 0 && (
+              <span className="ml-2 px-2 py-0.5 text-xs rounded-full bg-amber-100 text-amber-700">
+                {unclaimedForms.length}
+              </span>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="clients" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <Users className="w-4 h-4 mr-2" />
+            My Clients
+          </TabsTrigger>
+          <TabsTrigger value="sessions" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <CheckCircle className="w-4 h-4 mr-2" />
+            Sessions
+          </TabsTrigger>
+          <TabsTrigger value="questions" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <MessageCircle className="w-4 h-4 mr-2" />
+            Q&A
+          </TabsTrigger>
         </TabsList>
 
         {/* Unclaimed Mood Requests */}
         <TabsContent value="requests">
-          <Card>
-            <CardHeader>
+          <Card className="border-0 shadow-lg">
+            <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2">
                 <MessageSquare className="w-5 h-5 text-primary" />
-                New Mood Requests (Unclaimed)
+                New Mood Check-in Requests
               </CardTitle>
             </CardHeader>
             <CardContent>
               {unclaimedForms.length === 0 ? (
-                <p className="text-muted-foreground text-center py-8">
-                  No new requests at the moment
-                </p>
+                <div className="text-center py-12 text-muted-foreground">
+                  <CheckCircle className="w-16 h-16 mx-auto mb-4 text-green-400" />
+                  <p className="text-lg font-medium">All caught up!</p>
+                  <p className="text-sm">No new requests at the moment</p>
+                </div>
               ) : (
-                <div className="space-y-4">
+                <div className="grid md:grid-cols-2 gap-4">
                   {unclaimedForms.map((form) => (
-                    <div
+                    <motion.div
                       key={form.id}
-                      className="p-4 bg-secondary/50 rounded-xl border-l-4 border-amber-400"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-5 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl border-l-4 border-amber-400 shadow-sm"
                     >
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className="text-2xl">{getMoodEmoji(form.mood)}</span>
-                            <span className="font-semibold text-foreground capitalize">{form.mood}</span>
-                            <span className="text-xs text-muted-foreground">
-                              {new Date(form.created_at).toLocaleDateString()}
-                            </span>
+                          <div className="flex items-center gap-2 mb-3">
+                            <span className="text-3xl">{getMoodEmoji(form.mood)}</span>
+                            <div>
+                              <p className="font-semibold text-foreground">{form.name}</p>
+                              <p className="text-xs text-muted-foreground capitalize">{form.mood}</p>
+                            </div>
                           </div>
-                          <p className="text-sm text-foreground mb-1">
-                            <strong>Name:</strong> {form.name}
+                          <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                            {form.feelings || "No details provided"}
                           </p>
-                          <p className="text-sm text-muted-foreground line-clamp-2">
-                            <strong>Feelings:</strong> {form.feelings || "Not specified"}
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(form.created_at).toLocaleDateString()}
                           </p>
                         </div>
-                        <Button
-                          variant="warm"
-                          size="sm"
-                          onClick={() => handleClaimForm(form.id)}
-                        >
-                          Pick & Respond
-                        </Button>
                       </div>
-                    </div>
+                      <Button
+                        variant="hero"
+                        size="sm"
+                        className="w-full mt-4"
+                        onClick={() => handleClaimForm(form.id)}
+                      >
+                        <HeartHandshake className="w-4 h-4 mr-2" />
+                        Pick & Respond
+                      </Button>
+                    </motion.div>
                   ))}
                 </div>
               )}
@@ -306,8 +326,8 @@ export function CounselorDashboard() {
 
         {/* My Claimed Clients */}
         <TabsContent value="clients">
-          <Card>
-            <CardHeader>
+          <Card className="border-0 shadow-lg">
+            <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2">
                 <Users className="w-5 h-5 text-primary" />
                 My Assigned Clients
@@ -315,53 +335,47 @@ export function CounselorDashboard() {
             </CardHeader>
             <CardContent>
               {claimedForms.length === 0 ? (
-                <p className="text-muted-foreground text-center py-8">
-                  You haven't claimed any clients yet
-                </p>
+                <div className="text-center py-12 text-muted-foreground">
+                  <Users className="w-16 h-16 mx-auto mb-4 opacity-30" />
+                  <p>You haven't claimed any clients yet</p>
+                </div>
               ) : (
-                <div className="grid md:grid-cols-2 gap-4">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {claimedForms.map((form) => (
-                    <div
+                    <motion.div
                       key={form.id}
-                      className="p-4 bg-secondary/50 rounded-xl"
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="p-5 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl shadow-sm border border-blue-200/50"
                     >
-                      <div className="flex items-center gap-2 mb-3">
-                        <span className="text-2xl">{getMoodEmoji(form.mood)}</span>
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white text-lg">
+                          {getMoodEmoji(form.mood)}
+                        </div>
                         <div>
                           <p className="font-semibold text-foreground">{form.name}</p>
                           <p className="text-xs text-muted-foreground capitalize">{form.mood}</p>
                         </div>
                       </div>
                       
-                      <div className="space-y-2 text-sm">
-                        <div className="flex items-center gap-2">
-                          <Phone className="w-4 h-4 text-muted-foreground" />
-                          <a href={`tel:${form.phone}`} className="text-primary hover:underline">
-                            {form.phone}
-                          </a>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Mail className="w-4 h-4 text-muted-foreground" />
-                          <a href={`mailto:${form.email}`} className="text-primary hover:underline">
-                            {form.email}
-                          </a>
-                        </div>
+                      <div className="space-y-2">
+                        <a href={`tel:${form.phone}`} className="flex items-center gap-2 text-sm text-primary hover:underline">
+                          <Phone className="w-4 h-4" />
+                          {form.phone}
+                        </a>
+                        <a href={`mailto:${form.email}`} className="flex items-center gap-2 text-sm text-primary hover:underline">
+                          <Mail className="w-4 h-4" />
+                          {form.email}
+                        </a>
                       </div>
 
                       {form.feelings && (
-                        <div className="mt-3 pt-3 border-t border-border">
+                        <div className="mt-4 pt-3 border-t border-blue-200/50">
                           <p className="text-xs text-muted-foreground mb-1">Feelings:</p>
                           <p className="text-sm text-foreground">{form.feelings}</p>
                         </div>
                       )}
-
-                      {form.cause && (
-                        <div className="mt-2">
-                          <p className="text-xs text-muted-foreground mb-1">Cause:</p>
-                          <p className="text-sm text-foreground">{form.cause}</p>
-                        </div>
-                      )}
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               )}
@@ -371,38 +385,52 @@ export function CounselorDashboard() {
 
         {/* Assigned Sessions */}
         <TabsContent value="sessions">
-          <Card>
-            <CardHeader>
-              <CardTitle>My Sessions</CardTitle>
+          <Card className="border-0 shadow-lg">
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <CardTitle>My Sessions</CardTitle>
+                {assignedSessions.length > 0 && (
+                  <span className="text-sm text-muted-foreground">
+                    {completedSessions}/{assignedSessions.length} completed
+                  </span>
+                )}
+              </div>
+              {assignedSessions.length > 0 && (
+                <Progress value={(completedSessions / assignedSessions.length) * 100} className="h-2 mt-2" />
+              )}
             </CardHeader>
             <CardContent>
               {assignedSessions.length === 0 ? (
-                <p className="text-muted-foreground text-center py-8">
-                  No sessions assigned to you yet
-                </p>
+                <div className="text-center py-12 text-muted-foreground">
+                  <CheckCircle className="w-16 h-16 mx-auto mb-4 opacity-30" />
+                  <p>No sessions assigned to you yet</p>
+                </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {assignedSessions.map((session) => (
-                    <div
+                    <motion.div
                       key={session.id}
-                      className="p-4 bg-secondary/50 rounded-xl flex items-start justify-between gap-4"
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="p-4 bg-secondary/30 rounded-xl flex items-center justify-between gap-4 hover:bg-secondary/50 transition-colors"
                     >
-                      <div>
+                      <div className="flex-1">
                         <h4 className="font-semibold text-foreground">{session.title}</h4>
-                        <p className="text-sm text-muted-foreground">{session.description}</p>
+                        <p className="text-sm text-muted-foreground line-clamp-1">{session.description}</p>
                         {session.preferred_date && (
-                          <p className="text-xs text-primary mt-1">
-                            Preferred: {new Date(session.preferred_date).toLocaleDateString()}
+                          <p className="text-xs text-primary mt-1 flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {new Date(session.preferred_date).toLocaleDateString()}
                           </p>
                         )}
                       </div>
-                      <div className="flex flex-col gap-2">
-                        <span className={`px-2 py-1 text-xs rounded-full text-center ${
+                      <div className="flex items-center gap-3">
+                        <span className={`px-3 py-1 text-xs rounded-full font-medium ${
                           session.status === "completed" ? "bg-green-100 text-green-700" :
                           session.status === "in_progress" ? "bg-blue-100 text-blue-700" :
                           "bg-amber-100 text-amber-700"
                         }`}>
-                          {session.status}
+                          {session.status?.replace("_", " ")}
                         </span>
                         {session.status !== "completed" && (
                           <Button
@@ -417,7 +445,7 @@ export function CounselorDashboard() {
                           </Button>
                         )}
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               )}
@@ -427,8 +455,8 @@ export function CounselorDashboard() {
 
         {/* Q&A Tab */}
         <TabsContent value="questions">
-          <Card>
-            <CardHeader>
+          <Card className="border-0 shadow-lg">
+            <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2">
                 <MessageCircle className="w-5 h-5 text-primary" />
                 Member Questions
@@ -441,37 +469,65 @@ export function CounselorDashboard() {
             </CardHeader>
             <CardContent>
               {qaThreads.length === 0 ? (
-                <p className="text-muted-foreground text-center py-8">
-                  No questions yet
-                </p>
+                <div className="text-center py-12 text-muted-foreground">
+                  <MessageCircle className="w-16 h-16 mx-auto mb-4 opacity-30" />
+                  <p>No questions yet</p>
+                </div>
               ) : (
                 <div className="space-y-4">
                   {qaThreads.map((thread) => (
-                    <div
+                    <motion.div
                       key={thread.id}
-                      className={`p-4 bg-secondary/50 rounded-xl ${!thread.reply ? "border-l-4 border-amber-400" : "border-l-4 border-green-400"}`}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={`p-4 rounded-xl border-l-4 ${
+                        thread.reply 
+                          ? "bg-green-50 dark:bg-green-900/20 border-green-400" 
+                          : "bg-amber-50 dark:bg-amber-900/20 border-amber-400"
+                      }`}
                     >
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <p className="text-sm font-medium text-primary">
-                          {thread.guest_name || "Member Question"}
-                        </p>
-                        <span className="text-xs text-muted-foreground">
-                          {new Date(thread.created_at).toLocaleDateString()}
-                        </span>
+                      <div className="flex items-start justify-between gap-2 mb-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                            <User className="w-4 h-4 text-primary" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-foreground">
+                              {thread.guest_name || "Member"}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(thread.created_at).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
                       </div>
+                      
                       <p className="text-foreground mb-3">{thread.question}</p>
                       
                       {thread.reply ? (
-                        <div className="pt-3 border-t border-border">
-                          <p className="text-sm font-medium text-green-600 mb-1">Response:</p>
-                          <p className="text-foreground">{thread.reply}</p>
+                        <div className="pl-4 border-l-2 border-green-500 mt-3">
+                          <p className="text-sm text-foreground">{thread.reply}</p>
+                          <p className="text-xs text-green-600 mt-1">Replied</p>
                         </div>
                       ) : (
-                        <div className="pt-3 border-t border-border">
-                          <ReplyInput onSubmit={(reply) => handleReplyQuestion(thread.id, reply)} />
+                        <div className="flex gap-2 mt-3">
+                          <input
+                            type="text"
+                            value={replyText[thread.id] || ""}
+                            onChange={(e) => setReplyText(prev => ({ ...prev, [thread.id]: e.target.value }))}
+                            placeholder="Type your reply..."
+                            className="flex-1 px-3 py-2 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                          />
+                          <Button
+                            size="sm"
+                            onClick={() => handleReplyQuestion(thread.id)}
+                            disabled={!replyText[thread.id]?.trim()}
+                          >
+                            <Send className="w-4 h-4" />
+                          </Button>
                         </div>
                       )}
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               )}
@@ -479,36 +535,6 @@ export function CounselorDashboard() {
           </Card>
         </TabsContent>
       </Tabs>
-    </div>
-  );
-}
-
-// Reply Input Component
-function ReplyInput({ onSubmit }: { onSubmit: (reply: string) => void }) {
-  const [reply, setReply] = useState("");
-
-  return (
-    <div className="flex gap-2">
-      <input
-        type="text"
-        value={reply}
-        onChange={(e) => setReply(e.target.value)}
-        placeholder="Type your reply..."
-        className="flex-1 px-3 py-2 rounded-lg border border-input bg-background text-sm"
-      />
-      <Button
-        variant="warm"
-        size="sm"
-        onClick={() => {
-          if (reply.trim()) {
-            onSubmit(reply.trim());
-            setReply("");
-          }
-        }}
-        disabled={!reply.trim()}
-      >
-        <Send className="w-4 h-4" />
-      </Button>
     </div>
   );
 }

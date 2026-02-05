@@ -7,11 +7,14 @@ import {
   Video,
   Settings,
   MessageCircle,
-  Activity,
   Link2,
-  BookOpen
+  BookOpen,
+  Crown,
+  Sparkles,
+  TrendingUp,
+  Shield
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,12 +23,6 @@ import { BookingManagement } from "./BookingManagement";
 import { ContentManager } from "./ContentManager";
 import { CommunityLinkManager } from "./CommunityLinkManager";
 import { QAManager } from "./QAManager";
-import type { Database } from "@/integrations/supabase/types";
-
-type CounselorApplication = Database["public"]["Tables"]["counselor_applications"]["Row"];
-type Session = Database["public"]["Tables"]["sessions"]["Row"];
-type QAThread = Database["public"]["Tables"]["qa_threads"]["Row"];
-type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
 export function ExecutiveDashboard() {
   const { user } = useAuth();
@@ -71,24 +68,74 @@ export function ExecutiveDashboard() {
     }
   };
 
+  const statCards = [
+    { 
+      label: "Applications", 
+      value: pendingApplications, 
+      icon: FileText, 
+      gradient: "from-amber-400 to-orange-500",
+      bgColor: "from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20",
+      borderColor: "border-amber-200/50"
+    },
+    { 
+      label: "Unassigned Sessions", 
+      value: pendingSessions, 
+      icon: Calendar, 
+      gradient: "from-blue-400 to-cyan-500",
+      bgColor: "from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20",
+      borderColor: "border-blue-200/50"
+    },
+    { 
+      label: "Questions", 
+      value: unansweredQuestions, 
+      icon: MessageCircle, 
+      gradient: "from-purple-400 to-pink-500",
+      bgColor: "from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20",
+      borderColor: "border-purple-200/50"
+    },
+    { 
+      label: "Bookings", 
+      value: pendingBookings, 
+      icon: BookOpen, 
+      gradient: "from-rose-400 to-red-500",
+      bgColor: "from-rose-50 to-red-50 dark:from-rose-900/20 dark:to-red-900/20",
+      borderColor: "border-rose-200/50"
+    },
+    { 
+      label: "Counselors", 
+      value: counselorCount, 
+      icon: Users, 
+      gradient: "from-green-400 to-emerald-500",
+      bgColor: "from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20",
+      borderColor: "border-green-200/50"
+    },
+  ];
+
   return (
     <div className="space-y-8">
       {/* Welcome Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-card rounded-2xl p-6 shadow-soft"
+        className="relative overflow-hidden bg-gradient-to-br from-violet-500/10 via-purple-500/5 to-background rounded-3xl p-8 border border-violet-500/20"
       >
-        <div className="flex items-center justify-between flex-wrap gap-4">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full gradient-sage flex items-center justify-center">
-              <Settings className="w-8 h-8 text-primary-foreground" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-violet-500/10 to-purple-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-br from-primary/10 to-primary/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+        
+        <div className="relative">
+          <div className="flex items-center gap-5">
+            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-xl">
+              <Crown className="w-10 h-10 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-serif font-bold text-foreground">
-                Executive Dashboard
+              <div className="flex items-center gap-2 mb-1">
+                <Sparkles className="w-5 h-5 text-violet-500" />
+                <span className="text-sm font-medium text-violet-600">Executive Dashboard</span>
+              </div>
+              <h1 className="text-3xl font-serif font-bold text-foreground">
+                Welcome, Executive!
               </h1>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground mt-1">
                 Manage the platform and oversee all operations.
               </p>
             </div>
@@ -97,138 +144,82 @@ export function ExecutiveDashboard() {
       </motion.div>
 
       {/* Quick Stats */}
-      <div className="grid md:grid-cols-5 gap-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-card rounded-xl p-6 shadow-soft"
-        >
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
-              <FileText className="w-6 h-6 text-amber-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{pendingApplications}</p>
-              <p className="text-sm text-muted-foreground">Applications</p>
-            </div>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-card rounded-xl p-6 shadow-soft"
-        >
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
-              <Calendar className="w-6 h-6 text-blue-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{pendingSessions}</p>
-              <p className="text-sm text-muted-foreground">Unassigned</p>
-            </div>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="bg-card rounded-xl p-6 shadow-soft"
-        >
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center">
-              <MessageCircle className="w-6 h-6 text-purple-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{unansweredQuestions}</p>
-              <p className="text-sm text-muted-foreground">Questions</p>
-            </div>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="bg-card rounded-xl p-6 shadow-soft"
-        >
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-rose-100 flex items-center justify-center">
-              <BookOpen className="w-6 h-6 text-rose-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{pendingBookings}</p>
-              <p className="text-sm text-muted-foreground">Bookings</p>
-            </div>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="bg-card rounded-xl p-6 shadow-soft"
-        >
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
-              <Users className="w-6 h-6 text-green-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{counselorCount}</p>
-              <p className="text-sm text-muted-foreground">Counselors</p>
-            </div>
-          </div>
-        </motion.div>
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        {statCards.map((stat, index) => (
+          <motion.div
+            key={stat.label}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 * (index + 1) }}
+          >
+            <Card className={`border-0 shadow-lg bg-gradient-to-br ${stat.bgColor} ${stat.borderColor} border overflow-hidden`}>
+              <CardContent className="p-5">
+                <div className="flex items-center gap-4">
+                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center shadow-lg`}>
+                    <stat.icon className="w-7 h-7 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-3xl font-bold text-foreground">{stat.value}</p>
+                    <p className="text-xs text-muted-foreground">{stat.label}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ))}
       </div>
 
       {/* Main Tabs */}
-      <Tabs defaultValue="users" className="space-y-6">
-        <TabsList className="grid grid-cols-5 w-full max-w-3xl">
-          <TabsTrigger value="users" className="flex items-center gap-2">
-            <Users className="w-4 h-4" />
-            Users
-          </TabsTrigger>
-          <TabsTrigger value="bookings" className="flex items-center gap-2">
-            <Calendar className="w-4 h-4" />
-            Bookings
-          </TabsTrigger>
-          <TabsTrigger value="questions" className="flex items-center gap-2">
-            <MessageCircle className="w-4 h-4" />
-            Q&A
-          </TabsTrigger>
-          <TabsTrigger value="content" className="flex items-center gap-2">
-            <Video className="w-4 h-4" />
-            Content
-          </TabsTrigger>
-          <TabsTrigger value="community" className="flex items-center gap-2">
-            <Link2 className="w-4 h-4" />
-            Community
-          </TabsTrigger>
-        </TabsList>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+      >
+        <Tabs defaultValue="users" className="space-y-6">
+          <TabsList className="bg-card/80 backdrop-blur-sm border border-border/50 p-1.5 rounded-xl flex-wrap h-auto gap-1">
+            <TabsTrigger value="users" className="rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary/80 data-[state=active]:text-primary-foreground gap-2">
+              <Users className="w-4 h-4" />
+              <span className="hidden sm:inline">Users</span>
+            </TabsTrigger>
+            <TabsTrigger value="bookings" className="rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary/80 data-[state=active]:text-primary-foreground gap-2">
+              <Calendar className="w-4 h-4" />
+              <span className="hidden sm:inline">Bookings</span>
+            </TabsTrigger>
+            <TabsTrigger value="questions" className="rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary/80 data-[state=active]:text-primary-foreground gap-2">
+              <MessageCircle className="w-4 h-4" />
+              <span className="hidden sm:inline">Q&A</span>
+            </TabsTrigger>
+            <TabsTrigger value="content" className="rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary/80 data-[state=active]:text-primary-foreground gap-2">
+              <Video className="w-4 h-4" />
+              <span className="hidden sm:inline">Content</span>
+            </TabsTrigger>
+            <TabsTrigger value="community" className="rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary/80 data-[state=active]:text-primary-foreground gap-2">
+              <Link2 className="w-4 h-4" />
+              <span className="hidden sm:inline">Community</span>
+            </TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="users">
-          <UserManagement />
-        </TabsContent>
+          <TabsContent value="users" className="mt-6">
+            <UserManagement />
+          </TabsContent>
 
-        <TabsContent value="bookings">
-          <BookingManagement />
-        </TabsContent>
+          <TabsContent value="bookings" className="mt-6">
+            <BookingManagement />
+          </TabsContent>
 
-        <TabsContent value="questions">
-          <QAManager />
-        </TabsContent>
+          <TabsContent value="questions" className="mt-6">
+            <QAManager />
+          </TabsContent>
 
-        <TabsContent value="content">
-          <ContentManager />
-        </TabsContent>
+          <TabsContent value="content" className="mt-6">
+            <ContentManager />
+          </TabsContent>
 
-        <TabsContent value="community">
-          <CommunityLinkManager />
-        </TabsContent>
-      </Tabs>
+          <TabsContent value="community" className="mt-6">
+            <CommunityLinkManager />
+          </TabsContent>
+        </Tabs>
+      </motion.div>
     </div>
   );
 }

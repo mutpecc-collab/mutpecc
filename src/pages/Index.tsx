@@ -82,59 +82,88 @@ const Index = () => {
             delay: 0.2
           }} className="grid gap-4 sm:grid-cols-2">
               {/* Primary Action: Book */}
-              <button onClick={() => setShowQuickBook(true)} className="relative flex flex-col items-start p-6 rounded-2xl shadow-xl hover:translate-y-[-4px] transition-all group text-left overflow-hidden min-h-[200px]">
-                <img src={actionBookSession} alt="" className="absolute inset-0 w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-primary/80" />
+              <motion.button 
+                onClick={() => setShowQuickBook(true)} 
+                whileHover={{ y: -6, scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="relative flex flex-col items-start p-6 rounded-2xl shadow-xl transition-all group text-left overflow-hidden min-h-[200px]"
+              >
+                <img src={actionBookSession} alt="" className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/90 via-primary/80 to-primary/60 group-hover:from-primary/95 group-hover:via-primary/85 group-hover:to-primary/70 transition-all duration-300" />
                 <div className="relative z-10 flex flex-col h-full text-primary-foreground">
-                  <Calendar className="w-8 h-8 mb-4 opacity-90" />
+                  <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-4 group-hover:bg-white/30 transition-colors">
+                    <Calendar className="w-6 h-6" />
+                  </div>
                   <h3 className="text-xl font-bold mb-1">Book a Session</h3>
                   <p className="text-sm opacity-90 mb-4">Talk to a professional counselor privately.</p>
-                  <div className="mt-auto flex items-center gap-2 font-semibold">
+                  <div className="mt-auto flex items-center gap-2 font-semibold group-hover:gap-3 transition-all">
                     Quick Book <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
-              </button>
+              </motion.button>
 
               {/* Action: Log In */}
-              <Link to="/auth" className="relative flex flex-col items-start p-6 rounded-2xl shadow-sm hover:shadow-lg transition-all text-left overflow-hidden min-h-[200px]">
-                <img src={actionMemberLogin} alt="" className="absolute inset-0 w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-card/85" />
-                <div className="relative z-10 flex flex-col h-full">
-                  <LogIn className="w-8 h-8 mb-4 text-primary" />
-                  <h3 className="text-xl font-bold mb-1">Member Login</h3>
-                  <p className="text-sm text-muted-foreground mb-4">Access your dashboard and past sessions.</p>
-                  <div className="mt-auto flex items-center gap-2 text-primary font-semibold">
-                    Sign In <ArrowRight className="w-4 h-4" />
+              <motion.div
+                whileHover={{ y: -6, scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Link to="/auth" className="relative flex flex-col items-start p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all text-left overflow-hidden min-h-[200px] block">
+                  <img src={actionMemberLogin} alt="" className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-card/95 via-card/90 to-card/80" />
+                  <div className="relative z-10 flex flex-col h-full">
+                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                      <LogIn className="w-6 h-6 text-primary" />
+                    </div>
+                    <h3 className="text-xl font-bold mb-1">Member Login</h3>
+                    <p className="text-sm text-muted-foreground mb-4">Access your dashboard and past sessions.</p>
+                    <div className="mt-auto flex items-center gap-2 text-primary font-semibold">
+                      Sign In <ArrowRight className="w-4 h-4" />
+                    </div>
                   </div>
-                </div>
-              </Link>
+                </Link>
+              </motion.div>
+
               {/* Action: Mood Check */}
-              <button onClick={() => setShowMoodModal(true)} className="relative flex flex-col items-start p-6 rounded-2xl shadow-sm hover:shadow-lg transition-all text-left overflow-hidden min-h-[200px]">
-                <img src={actionMoodCheckin} alt="" className="absolute inset-0 w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-card/85" />
+              <motion.button 
+                onClick={() => setShowMoodModal(true)} 
+                whileHover={{ y: -6, scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="relative flex flex-col items-start p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all text-left overflow-hidden min-h-[200px] group"
+              >
+                <img src={actionMoodCheckin} alt="" className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                <div className="absolute inset-0 bg-gradient-to-br from-card/95 via-card/90 to-card/80" />
                 <div className="relative z-10 flex flex-col h-full">
-                  <Heart className="w-8 h-8 mb-4 text-destructive" />
+                  <div className="w-12 h-12 rounded-xl bg-destructive/10 flex items-center justify-center mb-4">
+                    <Heart className="w-6 h-6 text-destructive" />
+                  </div>
                   <h3 className="text-xl font-bold mb-1">Mood Check-in</h3>
                   <p className="text-sm text-muted-foreground mb-4">Not sure how you feel? Take a quick assessment.</p>
-                  <div className="mt-auto flex items-center gap-2 text-primary font-semibold">
-                    Start Check <ArrowRight className="w-4 h-4" />
+                  <div className="mt-auto flex items-center gap-2 text-primary font-semibold group-hover:gap-3 transition-all">
+                    Start Check <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
-              </button>
+              </motion.button>
 
               {/* Action: Join */}
-              <Link to="/community" className="relative flex flex-col items-start p-6 rounded-2xl shadow-sm hover:shadow-lg transition-all text-left overflow-hidden min-h-[200px]">
-                <img src={actionJoinCommunity} alt="" className="absolute inset-0 w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-secondary/85" />
-                <div className="relative z-10 flex flex-col h-full">
-                  <UserPlus className="w-8 h-8 mb-4 text-foreground" />
-                  <h3 className="text-xl font-bold mb-1">Join Community</h3>
-                  <p className="text-sm text-muted-foreground mb-4">Connect with our supportive community.</p>
-                  <div className="mt-auto flex items-center gap-2 font-semibold">
-                    Get Started <ArrowRight className="w-4 h-4" />
+              <motion.div
+                whileHover={{ y: -6, scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Link to="/community" className="relative flex flex-col items-start p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all text-left overflow-hidden min-h-[200px] block group">
+                  <img src={actionJoinCommunity} alt="" className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-secondary/95 via-secondary/90 to-secondary/80" />
+                  <div className="relative z-10 flex flex-col h-full">
+                    <div className="w-12 h-12 rounded-xl bg-foreground/10 flex items-center justify-center mb-4">
+                      <UserPlus className="w-6 h-6 text-foreground" />
+                    </div>
+                    <h3 className="text-xl font-bold mb-1">Join Community</h3>
+                    <p className="text-sm text-muted-foreground mb-4">Connect with our supportive community.</p>
+                    <div className="mt-auto flex items-center gap-2 font-semibold group-hover:gap-3 transition-all">
+                      Get Started <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </div>
                   </div>
-                </div>
-              </Link>
+                </Link>
+              </motion.div>
             </motion.div>
 
           </div>
