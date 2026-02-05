@@ -2,8 +2,8 @@ import { motion } from "framer-motion";
 import { MessageCircle, Phone } from "lucide-react";
 
 export function FloatingButtons() {
-  const whatsappNumber = "+1234567890"; // Replace with actual number
-  const phoneNumber = "+1234567890"; // Replace with actual number
+  const phoneNumber = "+254724742281";
+  const whatsappNumber = phoneNumber;
 
   return (
     <motion.div

@@ -12,6 +12,10 @@ import heroBg from "@/assets/hero-bg.jpg";
 import mentalHealthSupport from "@/assets/mental-health-support.jpg";
 import mentalWellnessMeditation from "@/assets/mental-wellness-meditation.jpg";
 import counselingSession from "@/assets/counseling-session.jpg";
+import actionBookSession from "@/assets/action-book-session.jpg";
+import actionMemberLogin from "@/assets/action-member-login.jpg";
+import actionMoodCheckin from "@/assets/action-mood-checkin.jpg";
+import actionJoinCommunity from "@/assets/action-join-community.jpg";
 
 const Index = () => {
   const [showMoodModal, setShowMoodModal] = useState(false);
@@ -83,46 +87,61 @@ const Index = () => {
               {/* Primary Action: Book */}
               <button 
                 onClick={() => setShowQuickBook(true)}
-                className="flex flex-col items-start p-6 bg-primary text-primary-foreground rounded-2xl shadow-xl hover:translate-y-[-4px] transition-all group text-left"
+                className="relative flex flex-col items-start p-6 rounded-2xl shadow-xl hover:translate-y-[-4px] transition-all group text-left overflow-hidden min-h-[200px]"
               >
-                <Calendar className="w-8 h-8 mb-4 opacity-80" />
-                <h3 className="text-xl font-bold mb-1">Book a Session</h3>
-                <p className="text-sm opacity-90 mb-4">Talk to a professional counselor privately.</p>
-                <div className="mt-auto flex items-center gap-2 font-semibold">
-                  Quick Book <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                <img src={actionBookSession} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-primary/80" />
+                <div className="relative z-10 flex flex-col h-full text-primary-foreground">
+                  <Calendar className="w-8 h-8 mb-4 opacity-90" />
+                  <h3 className="text-xl font-bold mb-1">Book a Session</h3>
+                  <p className="text-sm opacity-90 mb-4">Talk to a professional counselor privately.</p>
+                  <div className="mt-auto flex items-center gap-2 font-semibold">
+                    Quick Book <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
                 </div>
               </button>
 
               {/* Action: Log In */}
-              <Link to="/auth" className="flex flex-col items-start p-6 bg-card border-2 border-border rounded-2xl shadow-sm hover:border-primary/50 transition-all text-left">
-                <LogIn className="w-8 h-8 mb-4 text-primary" />
-                <h3 className="text-xl font-bold mb-1">Member Login</h3>
-                <p className="text-sm text-muted-foreground mb-4">Access your dashboard and past sessions.</p>
-                <div className="mt-auto flex items-center gap-2 text-primary font-semibold">
-                  Sign In <ArrowRight className="w-4 h-4" />
+              <Link to="/auth" className="relative flex flex-col items-start p-6 rounded-2xl shadow-sm hover:shadow-lg transition-all text-left overflow-hidden min-h-[200px]">
+                <img src={actionMemberLogin} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-card/85" />
+                <div className="relative z-10 flex flex-col h-full">
+                  <LogIn className="w-8 h-8 mb-4 text-primary" />
+                  <h3 className="text-xl font-bold mb-1">Member Login</h3>
+                  <p className="text-sm text-muted-foreground mb-4">Access your dashboard and past sessions.</p>
+                  <div className="mt-auto flex items-center gap-2 text-primary font-semibold">
+                    Sign In <ArrowRight className="w-4 h-4" />
+                  </div>
                 </div>
               </Link>
-
               {/* Action: Mood Check */}
               <button 
                 onClick={() => setShowMoodModal(true)}
-                className="flex flex-col items-start p-6 bg-card border-2 border-border rounded-2xl shadow-sm hover:border-primary/50 transition-all text-left"
+                className="relative flex flex-col items-start p-6 rounded-2xl shadow-sm hover:shadow-lg transition-all text-left overflow-hidden min-h-[200px]"
               >
-                <Heart className="w-8 h-8 mb-4 text-rose-500" />
-                <h3 className="text-xl font-bold mb-1">Mood Check-in</h3>
-                <p className="text-sm text-muted-foreground mb-4">Not sure how you feel? Take a quick assessment.</p>
-                <div className="mt-auto flex items-center gap-2 text-primary font-semibold">
-                  Start Check <ArrowRight className="w-4 h-4" />
+                <img src={actionMoodCheckin} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-card/85" />
+                <div className="relative z-10 flex flex-col h-full">
+                  <Heart className="w-8 h-8 mb-4 text-destructive" />
+                  <h3 className="text-xl font-bold mb-1">Mood Check-in</h3>
+                  <p className="text-sm text-muted-foreground mb-4">Not sure how you feel? Take a quick assessment.</p>
+                  <div className="mt-auto flex items-center gap-2 text-primary font-semibold">
+                    Start Check <ArrowRight className="w-4 h-4" />
+                  </div>
                 </div>
               </button>
 
               {/* Action: Join */}
-              <Link to="/community" className="flex flex-col items-start p-6 bg-secondary rounded-2xl shadow-sm hover:bg-secondary/80 transition-all text-left">
-                <UserPlus className="w-8 h-8 mb-4 text-foreground" />
-                <h3 className="text-xl font-bold mb-1">Join Community</h3>
-                <p className="text-sm text-muted-foreground mb-4">Connect with our supportive community.</p>
-                <div className="mt-auto flex items-center gap-2 font-semibold">
-                  Get Started <ArrowRight className="w-4 h-4" />
+              <Link to="/community" className="relative flex flex-col items-start p-6 rounded-2xl shadow-sm hover:shadow-lg transition-all text-left overflow-hidden min-h-[200px]">
+                <img src={actionJoinCommunity} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-secondary/85" />
+                <div className="relative z-10 flex flex-col h-full">
+                  <UserPlus className="w-8 h-8 mb-4 text-foreground" />
+                  <h3 className="text-xl font-bold mb-1">Join Community</h3>
+                  <p className="text-sm text-muted-foreground mb-4">Connect with our supportive community.</p>
+                  <div className="mt-auto flex items-center gap-2 font-semibold">
+                    Get Started <ArrowRight className="w-4 h-4" />
+                  </div>
                 </div>
               </Link>
             </motion.div>
