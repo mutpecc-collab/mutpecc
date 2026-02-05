@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Heart, Calendar, LogIn, UserPlus, Shield, Sparkles, Users } from "lucide-react";
+import { ArrowRight, Heart, Calendar, LogIn, UserPlus, Shield, Sparkles, Users, Clock, HandHeart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -9,6 +9,9 @@ import { MoodCheckInModal } from "@/components/MoodCheckInModal";
 import { QuickBookModal } from "@/components/QuickBookModal";
 import { Link } from "react-router-dom";
 import heroBg from "@/assets/hero-bg.jpg";
+import mentalHealthSupport from "@/assets/mental-health-support.jpg";
+import mentalWellnessMeditation from "@/assets/mental-wellness-meditation.jpg";
+import counselingSession from "@/assets/counseling-session.jpg";
 
 const Index = () => {
   const [showMoodModal, setShowMoodModal] = useState(false);
@@ -128,6 +131,104 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Mental Health Awareness Gallery */}
+      <section className="py-20 bg-background">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-12"
+          >
+            <span className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full text-primary text-sm font-semibold mb-4">
+              <HandHeart className="w-4 h-4" />
+              Your Mental Health Matters
+            </span>
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground mb-4">
+              Together, We Heal
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Our community provides a safe space for support, healing, and growth. Connect with professionals who understand your journey.
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {/* Support Group Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="group relative overflow-hidden rounded-2xl shadow-lg"
+            >
+              <img 
+                src={mentalHealthSupport} 
+                alt="Mental health support group" 
+                className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/20 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-6 text-primary-foreground">
+                <div className="flex items-center gap-2 mb-2">
+                  <Users className="w-5 h-5" />
+                  <span className="text-sm font-medium">Community Support</span>
+                </div>
+                <h3 className="text-xl font-bold">Group Sessions</h3>
+                <p className="text-sm opacity-90 mt-1">Connect with others who understand</p>
+              </div>
+            </motion.div>
+
+            {/* Wellness Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="group relative overflow-hidden rounded-2xl shadow-lg"
+            >
+              <img 
+                src={mentalWellnessMeditation} 
+                alt="Mental wellness and meditation" 
+                className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/20 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-6 text-primary-foreground">
+                <div className="flex items-center gap-2 mb-2">
+                  <Heart className="w-5 h-5" />
+                  <span className="text-sm font-medium">Self Care</span>
+                </div>
+                <h3 className="text-xl font-bold">Mindfulness & Peace</h3>
+                <p className="text-sm opacity-90 mt-1">Find your inner calm and balance</p>
+              </div>
+            </motion.div>
+
+            {/* Counseling Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="group relative overflow-hidden rounded-2xl shadow-lg"
+            >
+              <img 
+                src={counselingSession} 
+                alt="Professional counseling session" 
+                className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/20 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-6 text-primary-foreground">
+                <div className="flex items-center gap-2 mb-2">
+                  <Clock className="w-5 h-5" />
+                  <span className="text-sm font-medium">Professional Help</span>
+                </div>
+                <h3 className="text-xl font-bold">One-on-One Counseling</h3>
+                <p className="text-sm opacity-90 mt-1">Personalized support from experts</p>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       {/* Trust Section: Simple & Clean */}
       <section className="py-16 bg-secondary/30">
         <div className="container mx-auto px-4">
@@ -146,7 +247,20 @@ const Index = () => {
                 <p className="text-xs text-muted-foreground">Certified Counselors</p>
               </div>
             </div>
-            {/* Add two more trust markers here */}
+            <div className="flex items-center gap-3">
+              <Clock className="w-10 h-10 text-primary/60" />
+              <div>
+                <p className="font-bold">24/7 Support</p>
+                <p className="text-xs text-muted-foreground">Always here for you</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <HandHeart className="w-10 h-10 text-primary/60" />
+              <div>
+                <p className="font-bold">Compassionate</p>
+                <p className="text-xs text-muted-foreground">Judgment-free zone</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
