@@ -16,11 +16,9 @@ import actionBookSession from "@/assets/action-book-session.jpg";
 import actionMemberLogin from "@/assets/action-member-login.jpg";
 import actionMoodCheckin from "@/assets/action-mood-checkin.jpg";
 import actionJoinCommunity from "@/assets/action-join-community.jpg";
-
 const Index = () => {
   const [showMoodModal, setShowMoodModal] = useState(false);
   const [showQuickBook, setShowQuickBook] = useState(false);
-
   useEffect(() => {
     const hasSeenModal = sessionStorage.getItem("mutpecc-mood-checked");
     if (!hasSeenModal) {
@@ -31,9 +29,7 @@ const Index = () => {
       return () => clearTimeout(timer);
     }
   }, []);
-
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       <Header />
       <FloatingButtons />
       <MoodCheckInModal isOpen={showMoodModal} onClose={() => setShowMoodModal(false)} />
@@ -51,11 +47,15 @@ const Index = () => {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             
             {/* Left Side: Value Prop */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.7 }}
-            >
+            <motion.div initial={{
+            opacity: 0,
+            x: -30
+          }} animate={{
+            opacity: 1,
+            x: 0
+          }} transition={{
+            duration: 0.7
+          }}>
               <span className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full text-primary text-sm font-semibold mb-6">
                 <Sparkles className="w-4 h-4" />
                 Ready to start your healing journey?
@@ -67,28 +67,22 @@ const Index = () => {
                 Book a session with a certified counselor or join our supportive community today. Your privacy is 100% guaranteed.
               </p>
               
-              <div className="flex items-center gap-4 text-sm font-medium text-muted-foreground">
-                <div className="flex -space-x-2">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="w-8 h-8 rounded-full bg-primary/20 border-2 border-background" />
-                  ))}
-                </div>
-                <span>Joined by 500+ members this month</span>
-              </div>
+              
             </motion.div>
 
             {/* Right Side: Direct Action Cards */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.7, delay: 0.2 }}
-              className="grid gap-4 sm:grid-cols-2"
-            >
+            <motion.div initial={{
+            opacity: 0,
+            scale: 0.95
+          }} animate={{
+            opacity: 1,
+            scale: 1
+          }} transition={{
+            duration: 0.7,
+            delay: 0.2
+          }} className="grid gap-4 sm:grid-cols-2">
               {/* Primary Action: Book */}
-              <button 
-                onClick={() => setShowQuickBook(true)}
-                className="relative flex flex-col items-start p-6 rounded-2xl shadow-xl hover:translate-y-[-4px] transition-all group text-left overflow-hidden min-h-[200px]"
-              >
+              <button onClick={() => setShowQuickBook(true)} className="relative flex flex-col items-start p-6 rounded-2xl shadow-xl hover:translate-y-[-4px] transition-all group text-left overflow-hidden min-h-[200px]">
                 <img src={actionBookSession} alt="" className="absolute inset-0 w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-primary/80" />
                 <div className="relative z-10 flex flex-col h-full text-primary-foreground">
@@ -115,10 +109,7 @@ const Index = () => {
                 </div>
               </Link>
               {/* Action: Mood Check */}
-              <button 
-                onClick={() => setShowMoodModal(true)}
-                className="relative flex flex-col items-start p-6 rounded-2xl shadow-sm hover:shadow-lg transition-all text-left overflow-hidden min-h-[200px]"
-              >
+              <button onClick={() => setShowMoodModal(true)} className="relative flex flex-col items-start p-6 rounded-2xl shadow-sm hover:shadow-lg transition-all text-left overflow-hidden min-h-[200px]">
                 <img src={actionMoodCheckin} alt="" className="absolute inset-0 w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-card/85" />
                 <div className="relative z-10 flex flex-col h-full">
@@ -153,13 +144,17 @@ const Index = () => {
       {/* Mental Health Awareness Gallery */}
       <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-12"
-          >
+          <motion.div initial={{
+          opacity: 0,
+          y: 20
+        }} whileInView={{
+          opacity: 1,
+          y: 0
+        }} viewport={{
+          once: true
+        }} transition={{
+          duration: 0.6
+        }} className="text-center mb-12">
             <span className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full text-primary text-sm font-semibold mb-4">
               <HandHeart className="w-4 h-4" />
               Your Mental Health Matters
@@ -174,18 +169,19 @@ const Index = () => {
 
           <div className="grid md:grid-cols-3 gap-6">
             {/* Support Group Card */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="group relative overflow-hidden rounded-2xl shadow-lg"
-            >
-              <img 
-                src={mentalHealthSupport} 
-                alt="Mental health support group" 
-                className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-500"
-              />
+            <motion.div initial={{
+            opacity: 0,
+            y: 30
+          }} whileInView={{
+            opacity: 1,
+            y: 0
+          }} viewport={{
+            once: true
+          }} transition={{
+            duration: 0.5,
+            delay: 0.1
+          }} className="group relative overflow-hidden rounded-2xl shadow-lg">
+              <img src={mentalHealthSupport} alt="Mental health support group" className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/20 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-6 text-primary-foreground">
                 <div className="flex items-center gap-2 mb-2">
@@ -198,18 +194,19 @@ const Index = () => {
             </motion.div>
 
             {/* Wellness Card */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="group relative overflow-hidden rounded-2xl shadow-lg"
-            >
-              <img 
-                src={mentalWellnessMeditation} 
-                alt="Mental wellness and meditation" 
-                className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-500"
-              />
+            <motion.div initial={{
+            opacity: 0,
+            y: 30
+          }} whileInView={{
+            opacity: 1,
+            y: 0
+          }} viewport={{
+            once: true
+          }} transition={{
+            duration: 0.5,
+            delay: 0.2
+          }} className="group relative overflow-hidden rounded-2xl shadow-lg">
+              <img src={mentalWellnessMeditation} alt="Mental wellness and meditation" className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/20 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-6 text-primary-foreground">
                 <div className="flex items-center gap-2 mb-2">
@@ -222,18 +219,19 @@ const Index = () => {
             </motion.div>
 
             {/* Counseling Card */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="group relative overflow-hidden rounded-2xl shadow-lg"
-            >
-              <img 
-                src={counselingSession} 
-                alt="Professional counseling session" 
-                className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-500"
-              />
+            <motion.div initial={{
+            opacity: 0,
+            y: 30
+          }} whileInView={{
+            opacity: 1,
+            y: 0
+          }} viewport={{
+            once: true
+          }} transition={{
+            duration: 0.5,
+            delay: 0.3
+          }} className="group relative overflow-hidden rounded-2xl shadow-lg">
+              <img src={counselingSession} alt="Professional counseling session" className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/20 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-6 text-primary-foreground">
                 <div className="flex items-center gap-2 mb-2">
@@ -285,8 +283,6 @@ const Index = () => {
       </section>
 
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
