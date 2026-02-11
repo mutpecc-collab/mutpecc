@@ -85,7 +85,7 @@ export function Footer() {
           <div>
             <h4 className="font-serif font-semibold text-lg mb-4">Quick Links</h4>
             <ul className="space-y-2">
-              {["Home", "About", "Vlog", "Events", "Activities"].map((link) => (
+              {["Home", "About", "Vlog", "Events", "Activities", "Terms"].map((link) => (
                 <li key={link}>
                   <Link
                     to={link === "Home" ? "/" : `/${link.toLowerCase()}`}
@@ -135,8 +135,8 @@ export function Footer() {
             <ul className="space-y-3">
               <li className="flex items-center gap-3 text-background/70 text-sm">
                 <Mail className="w-4 h-4" />
-                <a href="mailto:grunnoh@mut.ac.ke" className="hover:text-background transition-colors">
-                  grunnoh@mut.ac.ke
+                <a href="mailto:Counsellor@mut.ac.ke" className="hover:text-background transition-colors">
+                  Counsellor@mut.ac.ke
                 </a>
               </li>
               <li className="flex items-center gap-3 text-background/70 text-sm">
