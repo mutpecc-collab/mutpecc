@@ -18,6 +18,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
+import { ShowMoreButton } from "@/components/ShowMoreButton";
+import { usePagination } from "@/hooks/usePagination";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -158,6 +160,11 @@ export function CounselorDashboard() {
   const unansweredQuestions = qaThreads.filter(q => !q.reply);
   const completedSessions = assignedSessions.filter(s => s.status === "completed").length;
 
+  const requestsPagination = usePagination(unclaimedForms, 10);
+  const clientsPagination = usePagination(claimedForms, 10);
+  const sessionsPagination = usePagination(assignedSessions, 10);
+  const qaPagination = usePagination(qaThreads, 10);
+
   return (
     <div className="space-y-8">
       {/* Welcome Header */}
@@ -282,43 +289,31 @@ export function CounselorDashboard() {
                   <p className="text-sm">No new requests at the moment</p>
                 </div>
               ) : (
-                <div className="grid md:grid-cols-2 gap-4">
-                  {unclaimedForms.map((form) => (
-                    <motion.div
-                      key={form.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="p-5 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl border-l-4 border-amber-400 shadow-sm"
-                    >
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-3">
-                            <span className="text-3xl">{getMoodEmoji(form.mood)}</span>
-                            <div>
-                              <p className="font-semibold text-foreground">{form.name}</p>
-                              <p className="text-xs text-muted-foreground capitalize">{form.mood}</p>
+                <>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {requestsPagination.paginatedItems.map((form) => (
+                      <motion.div key={form.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="p-5 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl border-l-4 border-amber-400 shadow-sm">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-3">
+                              <span className="text-3xl">{getMoodEmoji(form.mood)}</span>
+                              <div>
+                                <p className="font-semibold text-foreground">{form.name}</p>
+                                <p className="text-xs text-muted-foreground capitalize">{form.mood}</p>
+                              </div>
                             </div>
+                            <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{form.feelings || "No details provided"}</p>
+                            <p className="text-xs text-muted-foreground">{new Date(form.created_at).toLocaleDateString()}</p>
                           </div>
-                          <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                            {form.feelings || "No details provided"}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {new Date(form.created_at).toLocaleDateString()}
-                          </p>
                         </div>
-                      </div>
-                      <Button
-                        variant="hero"
-                        size="sm"
-                        className="w-full mt-4"
-                        onClick={() => handleClaimForm(form.id)}
-                      >
-                        <HeartHandshake className="w-4 h-4 mr-2" />
-                        Pick & Respond
-                      </Button>
-                    </motion.div>
-                  ))}
-                </div>
+                        <Button variant="hero" size="sm" className="w-full mt-4" onClick={() => handleClaimForm(form.id)}>
+                          <HeartHandshake className="w-4 h-4 mr-2" />Pick & Respond
+                        </Button>
+                      </motion.div>
+                    ))}
+                  </div>
+                  <ShowMoreButton hasMore={requestsPagination.hasMore} onClick={requestsPagination.showMore} totalCount={unclaimedForms.length} shownCount={requestsPagination.paginatedItems.length} />
+                </>
               )}
             </CardContent>
           </Card>
@@ -340,44 +335,43 @@ export function CounselorDashboard() {
                   <p>You haven't claimed any clients yet</p>
                 </div>
               ) : (
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {claimedForms.map((form) => (
-                    <motion.div
-                      key={form.id}
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      className="p-5 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl shadow-sm border border-blue-200/50"
-                    >
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white text-lg">
-                          {getMoodEmoji(form.mood)}
+                <>
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {clientsPagination.paginatedItems.map((form) => (
+                      <motion.div
+                        key={form.id}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="p-5 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl shadow-sm border border-blue-200/50"
+                      >
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white text-lg">
+                            {getMoodEmoji(form.mood)}
+                          </div>
+                          <div>
+                            <p className="font-semibold text-foreground">{form.name}</p>
+                            <p className="text-xs text-muted-foreground capitalize">{form.mood}</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-semibold text-foreground">{form.name}</p>
-                          <p className="text-xs text-muted-foreground capitalize">{form.mood}</p>
+                        <div className="space-y-2">
+                          <a href={`tel:${form.phone}`} className="flex items-center gap-2 text-sm text-primary hover:underline">
+                            <Phone className="w-4 h-4" />{form.phone}
+                          </a>
+                          <a href={`mailto:${form.email}`} className="flex items-center gap-2 text-sm text-primary hover:underline">
+                            <Mail className="w-4 h-4" />{form.email}
+                          </a>
                         </div>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <a href={`tel:${form.phone}`} className="flex items-center gap-2 text-sm text-primary hover:underline">
-                          <Phone className="w-4 h-4" />
-                          {form.phone}
-                        </a>
-                        <a href={`mailto:${form.email}`} className="flex items-center gap-2 text-sm text-primary hover:underline">
-                          <Mail className="w-4 h-4" />
-                          {form.email}
-                        </a>
-                      </div>
-
-                      {form.feelings && (
-                        <div className="mt-4 pt-3 border-t border-blue-200/50">
-                          <p className="text-xs text-muted-foreground mb-1">Feelings:</p>
-                          <p className="text-sm text-foreground">{form.feelings}</p>
-                        </div>
-                      )}
-                    </motion.div>
-                  ))}
-                </div>
+                        {form.feelings && (
+                          <div className="mt-4 pt-3 border-t border-blue-200/50">
+                            <p className="text-xs text-muted-foreground mb-1">Feelings:</p>
+                            <p className="text-sm text-foreground">{form.feelings}</p>
+                          </div>
+                        )}
+                      </motion.div>
+                    ))}
+                  </div>
+                  <ShowMoreButton hasMore={clientsPagination.hasMore} onClick={clientsPagination.showMore} totalCount={claimedForms.length} shownCount={clientsPagination.paginatedItems.length} />
+                </>
               )}
             </CardContent>
           </Card>
@@ -406,48 +400,34 @@ export function CounselorDashboard() {
                   <p>No sessions assigned to you yet</p>
                 </div>
               ) : (
-                <div className="space-y-3">
-                  {assignedSessions.map((session) => (
-                    <motion.div
-                      key={session.id}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="p-4 bg-secondary/30 rounded-xl flex items-center justify-between gap-4 hover:bg-secondary/50 transition-colors"
-                    >
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-foreground">{session.title}</h4>
-                        <p className="text-sm text-muted-foreground line-clamp-1">{session.description}</p>
-                        {session.preferred_date && (
-                          <p className="text-xs text-primary mt-1 flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
-                            {new Date(session.preferred_date).toLocaleDateString()}
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className={`px-3 py-1 text-xs rounded-full font-medium ${
-                          session.status === "completed" ? "bg-green-100 text-green-700" :
-                          session.status === "in_progress" ? "bg-blue-100 text-blue-700" :
-                          "bg-amber-100 text-amber-700"
-                        }`}>
-                          {session.status?.replace("_", " ")}
-                        </span>
-                        {session.status !== "completed" && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleUpdateSessionStatus(
-                              session.id,
-                              session.status === "assigned" ? "in_progress" : "completed"
-                            )}
-                          >
-                            {session.status === "assigned" ? "Start" : "Complete"}
-                          </Button>
-                        )}
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
+                <>
+                  <div className="space-y-3">
+                    {sessionsPagination.paginatedItems.map((session) => (
+                      <motion.div key={session.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="p-4 bg-secondary/30 rounded-xl flex items-center justify-between gap-4 hover:bg-secondary/50 transition-colors">
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-foreground">{session.title}</h4>
+                          <p className="text-sm text-muted-foreground line-clamp-1">{session.description}</p>
+                          {session.preferred_date && (
+                            <p className="text-xs text-primary mt-1 flex items-center gap-1">
+                              <Clock className="w-3 h-3" />{new Date(session.preferred_date).toLocaleDateString()}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className={`px-3 py-1 text-xs rounded-full font-medium ${session.status === "completed" ? "bg-green-100 text-green-700" : session.status === "in_progress" ? "bg-blue-100 text-blue-700" : "bg-amber-100 text-amber-700"}`}>
+                            {session.status?.replace("_", " ")}
+                          </span>
+                          {session.status !== "completed" && (
+                            <Button variant="outline" size="sm" onClick={() => handleUpdateSessionStatus(session.id, session.status === "assigned" ? "in_progress" : "completed")}>
+                              {session.status === "assigned" ? "Start" : "Complete"}
+                            </Button>
+                          )}
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                  <ShowMoreButton hasMore={sessionsPagination.hasMore} onClick={sessionsPagination.showMore} totalCount={assignedSessions.length} shownCount={sessionsPagination.paginatedItems.length} />
+                </>
               )}
             </CardContent>
           </Card>
@@ -474,62 +454,36 @@ export function CounselorDashboard() {
                   <p>No questions yet</p>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {qaThreads.map((thread) => (
-                    <motion.div
-                      key={thread.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className={`p-4 rounded-xl border-l-4 ${
-                        thread.reply 
-                          ? "bg-green-50 dark:bg-green-900/20 border-green-400" 
-                          : "bg-amber-50 dark:bg-amber-900/20 border-amber-400"
-                      }`}
-                    >
-                      <div className="flex items-start justify-between gap-2 mb-3">
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                            <User className="w-4 h-4 text-primary" />
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium text-foreground">
-                              {thread.guest_name || "Member"}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              {new Date(thread.created_at).toLocaleDateString()}
-                            </p>
+                <>
+                  <div className="space-y-4">
+                    {qaPagination.paginatedItems.map((thread) => (
+                      <motion.div key={thread.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={`p-4 rounded-xl border-l-4 ${thread.reply ? "bg-green-50 dark:bg-green-900/20 border-green-400" : "bg-amber-50 dark:bg-amber-900/20 border-amber-400"}`}>
+                        <div className="flex items-start justify-between gap-2 mb-3">
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center"><User className="w-4 h-4 text-primary" /></div>
+                            <div>
+                              <p className="text-sm font-medium text-foreground">{thread.guest_name || "Member"}</p>
+                              <p className="text-xs text-muted-foreground">{new Date(thread.created_at).toLocaleDateString()}</p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      
-                      <p className="text-foreground mb-3">{thread.question}</p>
-                      
-                      {thread.reply ? (
-                        <div className="pl-4 border-l-2 border-green-500 mt-3">
-                          <p className="text-sm text-foreground">{thread.reply}</p>
-                          <p className="text-xs text-green-600 mt-1">Replied</p>
-                        </div>
-                      ) : (
-                        <div className="flex gap-2 mt-3">
-                          <input
-                            type="text"
-                            value={replyText[thread.id] || ""}
-                            onChange={(e) => setReplyText(prev => ({ ...prev, [thread.id]: e.target.value }))}
-                            placeholder="Type your reply..."
-                            className="flex-1 px-3 py-2 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                          />
-                          <Button
-                            size="sm"
-                            onClick={() => handleReplyQuestion(thread.id)}
-                            disabled={!replyText[thread.id]?.trim()}
-                          >
-                            <Send className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      )}
-                    </motion.div>
-                  ))}
-                </div>
+                        <p className="text-foreground mb-3">{thread.question}</p>
+                        {thread.reply ? (
+                          <div className="pl-4 border-l-2 border-green-500 mt-3">
+                            <p className="text-sm text-foreground">{thread.reply}</p>
+                            <p className="text-xs text-green-600 mt-1">Replied</p>
+                          </div>
+                        ) : (
+                          <div className="flex gap-2 mt-3">
+                            <input type="text" value={replyText[thread.id] || ""} onChange={(e) => setReplyText(prev => ({ ...prev, [thread.id]: e.target.value }))} placeholder="Type your reply..." className="flex-1 px-3 py-2 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                            <Button size="sm" onClick={() => handleReplyQuestion(thread.id)} disabled={!replyText[thread.id]?.trim()}><Send className="w-4 h-4" /></Button>
+                          </div>
+                        )}
+                      </motion.div>
+                    ))}
+                  </div>
+                  <ShowMoreButton hasMore={qaPagination.hasMore} onClick={qaPagination.showMore} totalCount={qaThreads.length} shownCount={qaPagination.paginatedItems.length} />
+                </>
               )}
             </CardContent>
           </Card>

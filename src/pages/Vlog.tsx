@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Play, Calendar, User, Video } from "lucide-react";
+import { Play, Calendar, Video } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { FloatingButtons } from "@/components/FloatingButtons";
+import { ShowMoreButton } from "@/components/ShowMoreButton";
+import { usePagination } from "@/hooks/usePagination";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -17,6 +19,7 @@ const extractVideoId = (url: string): string | null => {
 const Vlog = () => {
   const [vlogs, setVlogs] = useState<Vlog[]>([]);
   const [loading, setLoading] = useState(true);
+  const { paginatedItems, hasMore, showMore } = usePagination(vlogs, 10);
 
   useEffect(() => {
     fetchVlogs();
@@ -84,78 +87,61 @@ const Vlog = () => {
               </p>
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {vlogs.map((vlog, index) => {
-                const videoId = extractVideoId(vlog.youtube_url);
-                const thumbnailUrl = vlog.thumbnail_url || (videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null);
+            <>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {paginatedItems.map((vlog, index) => {
+                  const videoId = extractVideoId(vlog.youtube_url);
+                  const thumbnailUrl = vlog.thumbnail_url || (videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null);
 
-                return (
-                  <motion.article
-                    key={vlog.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: index * 0.1 }}
-                    className="bg-card rounded-2xl overflow-hidden shadow-soft hover:shadow-elevated transition-shadow duration-300 group"
-                  >
-                    {/* Thumbnail */}
-                    <a
-                      href={vlog.youtube_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block"
+                  return (
+                    <motion.article
+                      key={vlog.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.6, delay: (index % 10) * 0.1 }}
+                      className="bg-card rounded-2xl overflow-hidden shadow-soft hover:shadow-elevated transition-shadow duration-300 group"
                     >
-                      <div className="relative aspect-video bg-muted">
-                        {thumbnailUrl ? (
-                          <img
-                            src={thumbnailUrl}
-                            alt={vlog.title}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <Video className="w-12 h-12 text-muted-foreground" />
-                          </div>
-                        )}
-                        <div className="absolute inset-0 bg-foreground/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center shadow-elevated">
-                            <Play className="w-6 h-6 text-primary-foreground ml-1" />
+                      <a href={vlog.youtube_url} target="_blank" rel="noopener noreferrer" className="block">
+                        <div className="relative aspect-video bg-muted">
+                          {thumbnailUrl ? (
+                            <img src={thumbnailUrl} alt={vlog.title} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <Video className="w-12 h-12 text-muted-foreground" />
+                            </div>
+                          )}
+                          <div className="absolute inset-0 bg-foreground/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center shadow-elevated">
+                              <Play className="w-6 h-6 text-primary-foreground ml-1" />
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </a>
-
-                    {/* Content */}
-                    <div className="p-6">
-                      <a
-                        href={vlog.youtube_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <h3 className="text-xl font-serif font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
-                          {vlog.title}
-                        </h3>
                       </a>
-                      {vlog.description && (
-                        <p className="text-muted-foreground text-sm leading-relaxed mb-4 line-clamp-2">
-                          {vlog.description}
-                        </p>
-                      )}
-                      <div className="flex items-center text-sm text-muted-foreground">
-                        <span className="flex items-center gap-1.5">
-                          <Calendar className="w-4 h-4" />
-                          {new Date(vlog.created_at).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })}
-                        </span>
+                      <div className="p-6">
+                        <a href={vlog.youtube_url} target="_blank" rel="noopener noreferrer">
+                          <h3 className="text-xl font-serif font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
+                            {vlog.title}
+                          </h3>
+                        </a>
+                        {vlog.description && (
+                          <p className="text-muted-foreground text-sm leading-relaxed mb-4 line-clamp-2">
+                            {vlog.description}
+                          </p>
+                        )}
+                        <div className="flex items-center text-sm text-muted-foreground">
+                          <span className="flex items-center gap-1.5">
+                            <Calendar className="w-4 h-4" />
+                            {new Date(vlog.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  </motion.article>
-                );
-              })}
-            </div>
+                    </motion.article>
+                  );
+                })}
+              </div>
+              <ShowMoreButton hasMore={hasMore} onClick={showMore} totalCount={vlogs.length} shownCount={paginatedItems.length} />
+            </>
           )}
         </div>
       </section>
