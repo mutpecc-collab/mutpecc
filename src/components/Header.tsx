@@ -5,7 +5,6 @@ import { Menu, X, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
-import logo from "@/assets/logo.png";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -15,6 +14,31 @@ const navLinks = [
   { href: "/activities", label: "Activities" },
   { href: "/ask-executive", label: "Ask Executive" },
 ];
+
+function LogoImage() {
+  const [imgError, setImgError] = useState(false);
+  const [imgLoaded, setImgLoaded] = useState(false);
+
+  return (
+    <div className="relative h-12 w-12 flex-shrink-0">
+      {/* Fallback M letter - shown while loading or on error */}
+      {(!imgLoaded || imgError) && (
+        <div className="absolute inset-0 rounded-full bg-primary flex items-center justify-center">
+          <span className="text-primary-foreground font-serif font-bold text-xl">M</span>
+        </div>
+      )}
+      {!imgError && (
+        <img
+          src="/logo.png"
+          alt="MUTPECC Logo"
+          className={cn("h-12 w-12 rounded-full object-cover", imgLoaded ? "opacity-100" : "opacity-0")}
+          onLoad={() => setImgLoaded(true)}
+          onError={() => setImgError(true)}
+        />
+      )}
+    </div>
+  );
+}
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -31,11 +55,11 @@ export function Header() {
     <header className="fixed top-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-md border-b border-border">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 md:h-20">
-          <Link to="/" className="flex items-center gap-3">
-            <img src="/logo.png" alt="MUTPECC Logo" className="h-12 w-auto" />
-            <div className="hidden sm:block">
-              <span className="text-xl font-serif font-bold text-primary tracking-wide">MUTPECC</span>
-              <p className="text-[10px] text-muted-foreground leading-tight -mt-0.5">Muranga University of Technology</p>
+          <Link to="/" className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <LogoImage />
+            <div className="min-w-0">
+              <span className="text-base sm:text-xl font-serif font-bold text-primary tracking-wide block truncate">MUTPECC</span>
+              <p className="text-[9px] sm:text-[10px] text-muted-foreground leading-tight -mt-0.5 truncate">Muranga University of Technology</p>
             </div>
           </Link>
 
